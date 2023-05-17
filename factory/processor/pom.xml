@@ -2,12 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <artifactId>parent</artifactId>
     <groupId>com.hannesdorfmann.annotationprocessing101.factorypattern</groupId>
     <version>1.0</version>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
 
   <artifactId>processor</artifactId>
 
@@ -24,25 +25,22 @@
     <dependency>
       <groupId>com.squareup</groupId>
       <artifactId>javapoet</artifactId>
-      <version>1.1.0</version>
+      <version>1.13.0</version>
     </dependency>
-
-
 
     <!-- Auto service annotation processor -->
     <dependency>
       <groupId>com.google.auto.service</groupId>
       <artifactId>auto-service</artifactId>
-      <version>1.0-rc1</version>
+      <version>1.0.1</version>
       <optional>true</optional>
     </dependency>
-
 
     <!-- Apache Commons StringUtils -->
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.0</version>
+      <version>3.12.0</version>
     </dependency>
 
   </dependencies>
@@ -64,8 +62,8 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
       </plugin>
+
     </plugins>
   </build>
-
 
 </project>
