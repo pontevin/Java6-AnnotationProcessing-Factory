@@ -28,35 +28,30 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class FactoryAnnotatedClass {
 
-  private TypeElement annotatedClassElement;
+  private final TypeElement annotatedClassElement;
   private String qualifiedGroupClassName;
-  private String simpleFactoryGroupName;
-  private String id;
+  private final String id;
 
-  /**
-   * @throws ProcessingException if id() from annotation is null
-   */
   public FactoryAnnotatedClass(TypeElement classElement) throws ProcessingException {
-    this.annotatedClassElement = classElement;
+    annotatedClassElement = classElement;
+    
     Factory annotation = classElement.getAnnotation(Factory.class);
     id = annotation.id();
 
     if (StringUtils.isEmpty(id)) {
       throw new ProcessingException(classElement,
-          "id() in @%s for class %s is null or empty! that's not allowed",
+          "id() in @%s for class %s must not be null or empty!",
           Factory.class.getSimpleName(), classElement.getQualifiedName().toString());
     }
 
-    // Get the full QualifiedTypeName
     try {
       Class<?> clazz = annotation.type();
       qualifiedGroupClassName = clazz.getCanonicalName();
-      simpleFactoryGroupName = clazz.getSimpleName();
-    } catch (MirroredTypeException mte) {
+    }
+    catch (MirroredTypeException mte) {
       DeclaredType classTypeMirror = (DeclaredType) mte.getTypeMirror();
       TypeElement classTypeElement = (TypeElement) classTypeMirror.asElement();
       qualifiedGroupClassName = classTypeElement.getQualifiedName().toString();
-      simpleFactoryGroupName = classTypeElement.getSimpleName().toString();
     }
   }
 
@@ -75,15 +70,6 @@ public class FactoryAnnotatedClass {
    */
   public String getQualifiedFactoryGroupName() {
     return qualifiedGroupClassName;
-  }
-
-  /**
-   * Get the simple name of the type specified in  {@link Factory#type()}.
-   *
-   * @return qualified name
-   */
-  public String getSimpleFactoryGroupName() {
-    return simpleFactoryGroupName;
   }
 
   /**

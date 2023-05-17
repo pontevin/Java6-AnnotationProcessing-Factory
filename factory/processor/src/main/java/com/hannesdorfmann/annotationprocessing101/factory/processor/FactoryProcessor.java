@@ -54,7 +54,8 @@ public class FactoryProcessor extends AbstractProcessor {
   private Elements elementUtils;
   private Filer filer;
   private Messager messager;
-  private Map<String, FactoryGroupedClasses> factoryClasses = new LinkedHashMap<String, FactoryGroupedClasses>();
+
+  private final Map<String, FactoryGroupedClasses> factoryClasses = new LinkedHashMap<String, FactoryGroupedClasses>();
 
   @Override
   public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -149,23 +150,21 @@ public class FactoryProcessor extends AbstractProcessor {
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-
     try {
+      Set<? extends Element> annotatedElements = roundEnv.getElementsAnnotatedWith(Factory.class);
 
-      // Scan classes
-      for (Element annotatedElement : roundEnv.getElementsAnnotatedWith(Factory.class)) {
+      for (Element annotatedElement : annotatedElements) {
 
-        // Check if a class has been annotated with @Factory
+        // Check if the annotated element is a Class
         if (annotatedElement.getKind() != ElementKind.CLASS) {
-          throw new ProcessingException(annotatedElement, "Only classes can be annotated with @%s",
-              Factory.class.getSimpleName());
+          throw new ProcessingException(
+            annotatedElement, "Only classes can be annotated with @%s", Factory.class.getSimpleName());
         }
 
-        // We can cast it, because we know that it of ElementKind.CLASS
+        // We can cast it, because we know that it's of ElementKind.CLASS
         TypeElement typeElement = (TypeElement) annotatedElement;
 
         FactoryAnnotatedClass annotatedClass = new FactoryAnnotatedClass(typeElement);
-
         checkValidClass(annotatedClass);
 
         // Everything is fine, so try to add
@@ -186,22 +185,24 @@ public class FactoryProcessor extends AbstractProcessor {
         factoryClass.generateCode(elementUtils, filer);
       }
       factoryClasses.clear();
-    } catch (ProcessingException e) {
-      error(e.getElement(), e.getMessage());
-    } catch (IOException e) {
-      error(null, e.getMessage());
+    }
+    catch (ProcessingException e) {
+      printError(e.getElement(), e.getMessage());
+    }
+    catch (IOException e) {
+      printError(null, e.getMessage());
     }
 
     return true;
   }
-
+  
   /**
    * Prints an error message
    *
    * @param e   The element which has caused the error. Can be null
    * @param msg The error message
    */
-  public void error(Element e, String msg) {
+  private void printError(Element e, String msg) {
     messager.printMessage(Diagnostic.Kind.ERROR, msg, e);
   }
 }
