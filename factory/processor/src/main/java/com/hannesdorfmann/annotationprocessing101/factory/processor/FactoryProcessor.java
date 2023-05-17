@@ -16,13 +16,11 @@
 
 package com.hannesdorfmann.annotationprocessing101.factory.processor;
 
-import com.google.auto.service.AutoService;
-import com.hannesdorfmann.annotationprocessing101.factory.annotation.Factory;
 import java.io.IOException;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
@@ -41,21 +39,25 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
+import com.google.auto.service.AutoService;
+import com.hannesdorfmann.annotationprocessing101.factory.annotation.Factory;
+
 /**
  * Annotation Processor for @Factory annotation
  *
  * @author Hannes Dorfmann
  */
-@AutoService(Processor.class) public class FactoryProcessor extends AbstractProcessor {
+@AutoService(Processor.class)
+public class FactoryProcessor extends AbstractProcessor {
 
   private Types typeUtils;
   private Elements elementUtils;
   private Filer filer;
   private Messager messager;
-  private Map<String, FactoryGroupedClasses> factoryClasses =
-      new LinkedHashMap<String, FactoryGroupedClasses>();
+  private Map<String, FactoryGroupedClasses> factoryClasses = new LinkedHashMap<String, FactoryGroupedClasses>();
 
-  @Override public synchronized void init(ProcessingEnvironment processingEnv) {
+  @Override
+  public synchronized void init(ProcessingEnvironment processingEnv) {
     super.init(processingEnv);
     typeUtils = processingEnv.getTypeUtils();
     elementUtils = processingEnv.getElementUtils();
@@ -63,13 +65,13 @@ import javax.tools.Diagnostic;
     messager = processingEnv.getMessager();
   }
 
-  @Override public Set<String> getSupportedAnnotationTypes() {
-    Set<String> annotations = new LinkedHashSet<String>();
-    annotations.add(Factory.class.getCanonicalName());
-    return annotations;
+  @Override
+  public Set<String> getSupportedAnnotationTypes() {
+    return Set.of(Factory.class.getCanonicalName());
   }
 
-  @Override public SourceVersion getSupportedSourceVersion() {
+  @Override
+  public SourceVersion getSupportedSourceVersion() {
     return SourceVersion.latestSupported();
   }
 
@@ -94,8 +96,7 @@ import javax.tools.Diagnostic;
     }
 
     // Check inheritance: Class must be childclass as specified in @Factory.type();
-    TypeElement superClassElement =
-        elementUtils.getTypeElement(item.getQualifiedFactoryGroupName());
+    TypeElement superClassElement = elementUtils.getTypeElement(item.getQualifiedFactoryGroupName());
     if (superClassElement.getKind() == ElementKind.INTERFACE) {
       // Check interface implemented
       if (!classElement.getInterfaces().contains(superClassElement.asType())) {
@@ -168,15 +169,15 @@ import javax.tools.Diagnostic;
         checkValidClass(annotatedClass);
 
         // Everything is fine, so try to add
-        FactoryGroupedClasses factoryClass =
-            factoryClasses.get(annotatedClass.getQualifiedFactoryGroupName());
+        FactoryGroupedClasses factoryClass = factoryClasses.get(annotatedClass.getQualifiedFactoryGroupName());
         if (factoryClass == null) {
           String qualifiedGroupName = annotatedClass.getQualifiedFactoryGroupName();
           factoryClass = new FactoryGroupedClasses(qualifiedGroupName);
           factoryClasses.put(qualifiedGroupName, factoryClass);
         }
 
-        // Checks if id is conflicting with another @Factory annotated class with the same id
+        // Checks if id is conflicting with another @Factory annotated class with the
+        // same id
         factoryClass.add(annotatedClass);
       }
 
@@ -197,7 +198,7 @@ import javax.tools.Diagnostic;
   /**
    * Prints an error message
    *
-   * @param e The element which has caused the error. Can be null
+   * @param e   The element which has caused the error. Can be null
    * @param msg The error message
    */
   public void error(Element e, String msg) {

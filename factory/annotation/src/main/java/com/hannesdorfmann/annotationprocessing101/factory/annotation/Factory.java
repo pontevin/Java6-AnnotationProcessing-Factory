@@ -26,12 +26,15 @@ import java.lang.annotation.Target;
  *
  * @author Hannes Dorfmann
  */
-@Target(ElementType.TYPE) @Retention(RetentionPolicy.CLASS) public @interface Factory {
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.CLASS)
+
+public @interface Factory {
 
   /**
    * The name of the factory
    */
-  Class type();
+  Class<?> type();
 
   /**
    * The identifier for determining which item should be instantiated
