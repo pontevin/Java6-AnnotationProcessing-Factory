@@ -30,4 +30,9 @@ public class CalzonePizza implements Meal {
   @Override public float getPrice() {
     return 8.5f;
   }
+
+  @Override
+  public boolean isVegetarian() {
+      return false;
+  }
 }
