@@ -29,7 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 public class FactoryAnnotatedClass {
 
   private final TypeElement annotatedClassElement;
-  private String qualifiedGroupClassName;
+  private final String qualifiedGroupClassName;
   private final String id;
 
   public FactoryAnnotatedClass(TypeElement classElement) throws ProcessingException {
@@ -44,31 +44,32 @@ public class FactoryAnnotatedClass {
           Factory.class.getSimpleName(), classElement.getQualifiedName().toString());
     }
 
+    qualifiedGroupClassName = determineGroupClassName(annotation);
+  }
+
+  private String determineGroupClassName(Factory annotation) {
     try {
       Class<?> clazz = annotation.type();
-      qualifiedGroupClassName = clazz.getCanonicalName();
+      return clazz.getCanonicalName();
     }
     catch (MirroredTypeException mte) {
       DeclaredType classTypeMirror = (DeclaredType) mte.getTypeMirror();
       TypeElement classTypeElement = (TypeElement) classTypeMirror.asElement();
-      qualifiedGroupClassName = classTypeElement.getQualifiedName().toString();
+      return classTypeElement.getQualifiedName().toString();
     }
   }
 
   /**
    * Get the id as specified in {@link Factory#id()}.
-   * return the id
    */
   public String getId() {
     return id;
   }
 
   /**
-   * Get the full qualified name of the type specified in  {@link Factory#type()}.
-   *
-   * @return qualified name
+   * Get the full qualified name of the type specified in {@link Factory#type()}.
    */
-  public String getQualifiedFactoryGroupName() {
+  public String getQualifiedGroupClassName() {
     return qualifiedGroupClassName;
   }
 

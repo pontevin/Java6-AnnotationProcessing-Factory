@@ -1,5 +1,6 @@
 package com.hannesdorfmann.annotationprocessing101.factory.drinks;
 
+import com.hannesdorfmann.annotationprocessing101.factory.Drink;
 import com.hannesdorfmann.annotationprocessing101.factory.annotation.Factory;
 
 @Factory(

@@ -16,6 +16,7 @@
 
 package com.hannesdorfmann.annotationprocessing101.factory.meals;
 
+import com.hannesdorfmann.annotationprocessing101.factory.Meal;
 import com.hannesdorfmann.annotationprocessing101.factory.annotation.Factory;
 
 /**

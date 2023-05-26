@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package com.hannesdorfmann.annotationprocessing101.factory.meals;
-
-import com.hannesdorfmann.annotationprocessing101.factory.Product;
+package com.hannesdorfmann.annotationprocessing101.factory;
 
 /**
  * @author Hannes Dorfmann

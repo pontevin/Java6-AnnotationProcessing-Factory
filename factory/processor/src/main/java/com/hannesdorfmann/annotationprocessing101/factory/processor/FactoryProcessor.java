@@ -76,14 +76,62 @@ public class FactoryProcessor extends AbstractProcessor {
     return SourceVersion.latestSupported();
   }
 
+  @Override
+  public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+    try {
+      Set<? extends Element> annotatedElements = roundEnv.getElementsAnnotatedWith(Factory.class);
+
+      for (Element annotatedElement : annotatedElements) {
+
+        // Check if the annotated element is a Class
+        if (annotatedElement.getKind() != ElementKind.CLASS) {
+          throw new ProcessingException(
+            annotatedElement, "Only classes can be annotated with @%s", Factory.class.getSimpleName());
+        }
+
+        // We can cast it, because we know that it's of ElementKind.CLASS
+        TypeElement typeElement = (TypeElement) annotatedElement;
+
+        FactoryAnnotatedClass annotatedClass = new FactoryAnnotatedClass(typeElement);
+        checkAnnotationValidity(annotatedClass);
+
+        // Everything is fine, so try to add
+        String qualifiedGroupName = annotatedClass.getQualifiedGroupClassName();
+        FactoryGroupedClasses factoryClass = factoryClasses.get(qualifiedGroupName);
+        if (factoryClass == null) {
+          factoryClass = new FactoryGroupedClasses(qualifiedGroupName);
+          factoryClasses.put(qualifiedGroupName, factoryClass);
+        }
+
+        // Checks if id is conflicting with another @Factory annotated class with the
+        // same id
+        factoryClass.add(annotatedClass);
+      }
+
+      // Generate code
+      for (FactoryGroupedClasses factoryClass : factoryClasses.values()) {
+        factoryClass.generateCode(elementUtils, filer);
+      }
+      factoryClasses.clear();
+    }
+    catch (ProcessingException e) {
+      printError(e.getElement(), e.getMessage());
+    }
+    catch (IOException e) {
+      printError(null, e.getMessage());
+    }
+
+    return true;
+  }
+
   /**
    * Checks if the annotated element observes our rules
    */
-  private void checkValidClass(FactoryAnnotatedClass item) throws ProcessingException {
+  private void checkAnnotationValidity(FactoryAnnotatedClass item) throws ProcessingException {
 
-    // Cast to TypeElement, has more type specific methods
     TypeElement classElement = item.getTypeElement();
 
+    // Check if it's a public class
     if (!classElement.getModifiers().contains(Modifier.PUBLIC)) {
       throw new ProcessingException(classElement, "The class %s is not public.",
           classElement.getQualifiedName().toString());
@@ -97,14 +145,14 @@ public class FactoryProcessor extends AbstractProcessor {
     }
 
     // Check inheritance: Class must be childclass as specified in @Factory.type();
-    TypeElement superClassElement = elementUtils.getTypeElement(item.getQualifiedFactoryGroupName());
+    TypeElement superClassElement = elementUtils.getTypeElement(item.getQualifiedGroupClassName());
     if (superClassElement.getKind() == ElementKind.INTERFACE) {
       // Check interface implemented
       if (!classElement.getInterfaces().contains(superClassElement.asType())) {
         throw new ProcessingException(classElement,
             "The class %s annotated with @%s must implement the interface %s",
             classElement.getQualifiedName().toString(), Factory.class.getSimpleName(),
-            item.getQualifiedFactoryGroupName());
+            item.getQualifiedGroupClassName());
       }
     } else {
       // Check subclassing
@@ -117,10 +165,10 @@ public class FactoryProcessor extends AbstractProcessor {
           throw new ProcessingException(classElement,
               "The class %s annotated with @%s must inherit from %s",
               classElement.getQualifiedName().toString(), Factory.class.getSimpleName(),
-              item.getQualifiedFactoryGroupName());
+              item.getQualifiedGroupClassName());
         }
 
-        if (superClassType.toString().equals(item.getQualifiedFactoryGroupName())) {
+        if (superClassType.toString().equals(item.getQualifiedGroupClassName())) {
           // Required super class found
           break;
         }
@@ -148,54 +196,6 @@ public class FactoryProcessor extends AbstractProcessor {
         classElement.getQualifiedName().toString());
   }
 
-  @Override
-  public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-    try {
-      Set<? extends Element> annotatedElements = roundEnv.getElementsAnnotatedWith(Factory.class);
-
-      for (Element annotatedElement : annotatedElements) {
-
-        // Check if the annotated element is a Class
-        if (annotatedElement.getKind() != ElementKind.CLASS) {
-          throw new ProcessingException(
-            annotatedElement, "Only classes can be annotated with @%s", Factory.class.getSimpleName());
-        }
-
-        // We can cast it, because we know that it's of ElementKind.CLASS
-        TypeElement typeElement = (TypeElement) annotatedElement;
-
-        FactoryAnnotatedClass annotatedClass = new FactoryAnnotatedClass(typeElement);
-        checkValidClass(annotatedClass);
-
-        // Everything is fine, so try to add
-        FactoryGroupedClasses factoryClass = factoryClasses.get(annotatedClass.getQualifiedFactoryGroupName());
-        if (factoryClass == null) {
-          String qualifiedGroupName = annotatedClass.getQualifiedFactoryGroupName();
-          factoryClass = new FactoryGroupedClasses(qualifiedGroupName);
-          factoryClasses.put(qualifiedGroupName, factoryClass);
-        }
-
-        // Checks if id is conflicting with another @Factory annotated class with the
-        // same id
-        factoryClass.add(annotatedClass);
-      }
-
-      // Generate code
-      for (FactoryGroupedClasses factoryClass : factoryClasses.values()) {
-        factoryClass.generateCode(elementUtils, filer);
-      }
-      factoryClasses.clear();
-    }
-    catch (ProcessingException e) {
-      printError(e.getElement(), e.getMessage());
-    }
-    catch (IOException e) {
-      printError(null, e.getMessage());
-    }
-
-    return true;
-  }
-  
   /**
    * Prints an error message
    *
