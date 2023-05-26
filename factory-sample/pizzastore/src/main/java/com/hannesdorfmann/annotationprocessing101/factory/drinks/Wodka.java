@@ -1,4 +1,4 @@
-package com.hannesdorfmann.annotationprocessing101.factory;
+package com.hannesdorfmann.annotationprocessing101.factory.drinks;
 
 import com.hannesdorfmann.annotationprocessing101.factory.annotation.Factory;
 

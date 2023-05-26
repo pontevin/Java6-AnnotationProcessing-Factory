@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.hannesdorfmann.annotationprocessing101.factory;
+package com.hannesdorfmann.annotationprocessing101.factory.meals;
 
 import com.hannesdorfmann.annotationprocessing101.factory.annotation.Factory;
 

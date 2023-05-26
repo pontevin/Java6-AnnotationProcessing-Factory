@@ -14,21 +14,15 @@
  * limitations under the License.
  */
 
-package com.hannesdorfmann.annotationprocessing101.factory;
+package com.hannesdorfmann.annotationprocessing101.factory.meals;
 
-import com.hannesdorfmann.annotationprocessing101.factory.annotation.Factory;
+import com.hannesdorfmann.annotationprocessing101.factory.Product;
 
 /**
  * @author Hannes Dorfmann
  */
-
-@Factory(
-    id = "Margherita",
-    type = Meal.class
-)
-public class MargheritaPizza implements Meal {
-
-  @Override public float getPrice() {
-    return 6f;
-  }
+public interface Meal extends Product {
+    default boolean isVegetarian() {
+      return true;
+    }
 }

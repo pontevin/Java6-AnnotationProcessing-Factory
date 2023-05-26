@@ -20,6 +20,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import com.hannesdorfmann.annotationprocessing101.factory.meals.CalzonePizza;
+import com.hannesdorfmann.annotationprocessing101.factory.meals.MargheritaPizza;
+import com.hannesdorfmann.annotationprocessing101.factory.meals.Meal;
+import com.hannesdorfmann.annotationprocessing101.factory.meals.Tiramisu;
+
 /**
  * @author Hannes Dorfmann
  */

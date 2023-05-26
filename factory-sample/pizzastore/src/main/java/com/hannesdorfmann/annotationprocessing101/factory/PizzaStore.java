@@ -20,6 +20,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import com.hannesdorfmann.annotationprocessing101.factory.drinks.Drink;
+import com.hannesdorfmann.annotationprocessing101.factory.drinks.DrinkFactory;
+import com.hannesdorfmann.annotationprocessing101.factory.meals.Meal;
+import com.hannesdorfmann.annotationprocessing101.factory.meals.MealFactory;
+
 /**
  * @author Hannes Dorfmann
  */
@@ -48,7 +53,8 @@ public class PizzaStore {
     Meal meal = pizzaStore.orderMeal(readConsole("eat"));
     Drink drink = pizzaStore.orderDrink(readConsole("drink"));
     System.out.println("--- Bill ---");
-    System.out.println("Meal $" + meal.getPrice());
-    System.out.println("Drink $" + drink.getPrice());
+    String veggy = meal.isVegetarian() ? " - vegetarian" : "";
+    System.out.println("Meal: $" + meal.getPrice() + veggy);
+    System.out.println("Drink: $" + drink.getPrice() + "(" + drink.getAmountInMl() + "ml)");
   }
 }

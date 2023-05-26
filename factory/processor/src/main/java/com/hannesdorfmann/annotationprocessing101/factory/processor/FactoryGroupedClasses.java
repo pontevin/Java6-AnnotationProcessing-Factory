@@ -77,7 +77,6 @@ public class FactoryGroupedClasses {
   public void generateCode(Elements elementUtils, Filer filer) throws IOException {
     TypeElement superClassName = elementUtils.getTypeElement(qualifiedClassName);
     String factoryClassName = superClassName.getSimpleName() + SUFFIX;
-    String qualifiedFactoryClassName = qualifiedClassName + SUFFIX;
     PackageElement pkg = elementUtils.getPackageOf(superClassName);
     String packageName = pkg.isUnnamed() ? null : pkg.getQualifiedName().toString();
 
@@ -101,10 +100,14 @@ public class FactoryGroupedClasses {
 
     method.addStatement("throw new IllegalArgumentException($S + id)", "Unknown id = ");
 
-    TypeSpec typeSpec = TypeSpec.classBuilder(factoryClassName).addMethod(method.build()).build();
-
+    MethodSpec methodSpec = method.build();
+    
+    TypeSpec.Builder type = TypeSpec.classBuilder(factoryClassName).addModifiers(Modifier.PUBLIC).addMethod(methodSpec);
+    TypeSpec typeSpec = type.build();
+    
     // Write file
-    JavaFile.builder(packageName, typeSpec).build().writeTo(filer);
+    final JavaFile javaFile = JavaFile.builder(packageName, typeSpec).build();
+    javaFile.writeTo(filer);
   }
 
   /**
